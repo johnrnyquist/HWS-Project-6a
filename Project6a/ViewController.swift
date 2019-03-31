@@ -10,9 +10,13 @@ class ViewController: UIViewController {
     var score = 0
     var correctAnswer = 0
     var numQuestionsAsked = 0
+    var previousHighScore = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let defaults = UserDefaults.standard
+        previousHighScore = defaults.integer(forKey: "highScore")
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareTapped))
         
@@ -56,7 +60,16 @@ class ViewController: UIViewController {
             ac = UIAlertController(title: alertTitle, message: "Your score is \(score)", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
         }else{
-            ac = UIAlertController(title: "Game Over", message: "Your score is \(score)", preferredStyle: .alert)
+            let message: String
+            if self.score > self.previousHighScore {
+                self.previousHighScore = self.score
+                let defaults = UserDefaults.standard
+                defaults.set(self.score, forKey: "highScore")
+                message = "Your score is \(score), a new high!"
+            } else {
+                message = "Your score is \(score)"
+            }
+            ac = UIAlertController(title: "Game Over", message: message, preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             title = "\(countries[correctAnswer].uppercased()) Score: \(score)"
         }
